@@ -5,6 +5,7 @@ const { $, on } = Ember;
 const { isFunction, proxy } = $;
 
 export default Ember.Component.extend({
+  defaultParams: {},
   layout: layout,
   params: {},
   tagName: 'div',
@@ -110,8 +111,10 @@ export default Ember.Component.extend({
   },
 
   renderFroalaEditor: on('didInsertElement', function() {
+    const defaultParams = this.get('defaultParams');
     const events = this.get('eventNames');
-    const froala = this.$().editable(this.get('params'));
+    const params = Ember.merge(defaultParams, this.get('params'));
+    const froala = this.$().editable(params);
     const froalaElement = this.$();
 
     froalaElement.editable('setHTML', this.get('value') || '', false);
