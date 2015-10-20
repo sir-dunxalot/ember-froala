@@ -1,7 +1,8 @@
 import Ember from 'ember';
 import layout from '../templates/components/froala-editor';
 
-const { isFunction, proxy } = Ember.$;
+const { $, on } = Ember;
+const { isFunction, proxy } = $;
 
 export default Ember.Component.extend({
     layout: layout,
@@ -97,7 +98,18 @@ export default Ember.Component.extend({
       'videoRemoved',
     ],
 
-    didInsertElement: function() {
+    handleFroalaEvent: function(event, editor) {
+      const eventName = event.namespace;
+      const actionHandler = this.attrs[eventName];
+
+      if (isFunction(actionHandler)) {
+        actionHandler(event, editor);
+      } else {
+        this.sendAction(eventName, event, editor);
+      }
+    },
+
+    renderFroalaEditor: on('didInsertElement', function() {
       const events = this.get('eventNames');
       const froala = this.$().editable(this.get('params'));
       const froalaElement = this.$();
@@ -111,23 +123,12 @@ export default Ember.Component.extend({
       });
 
       this.set('_froala', froala);
-    },
+    }),
 
-    handleFroalaEvent: function(event, editor) {
-      const eventName = event.namespace;
-      const actionHandler = this.attrs[eventName];
-
-      if (isFunction(actionHandler)) {
-        actionHandler(event, editor);
-      } else {
-        this.sendAction(eventName, event, editor);
-      }
-    },
-
-    willDestroyElement: function() {
+    teardownFroalaEditor: on('willDestroyElement', function() {
       if (this.get('_froala')) {
         this.$().editable('destroy');
       }
-    }
-});
+    }),
 
+});
