@@ -50,6 +50,24 @@ export default Ember.Controller.extend({
 {{froala-editor params=froalaEditor.params value=value focus=(action "focus") contentChanged=(action "contentChanged")}}
 ```
 
+* Default Parameters
+
+You can set the default params for the editor in the `{{froala-editor}}` component. For example:
+
+```
+// your-app/component/froala-editor.js
+
+import FroalaEditorComponent from 'ember-froala/components/froala-editor';
+
+export default FroalaEditorComponent.extend({
+  defaultParams: {
+    inlineMode: false,
+  },
+});
+```
+
+Default params will be merged with the options passed via the `params`. Options in `params` override `defaultParams`.
+
 ### Please Note:
 The `value` is only for the initial value of the field.
 It will not be updated when the user changes the text.
