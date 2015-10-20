@@ -1,14 +1,15 @@
 import Ember from 'ember';
 import layout from '../templates/components/froala-editor';
+
 const { isFunction, proxy } = Ember.$;
 
 export default Ember.Component.extend({
     layout: layout,
-
-    tagName: 'div',
-    _froala: null,
     params: {},
+    tagName: 'div',
     value: null,
+    _froala: null,
+
     eventNames: [
       'afterFileUpload',
       'afterImageUpload',
@@ -97,25 +98,26 @@ export default Ember.Component.extend({
     ],
 
     didInsertElement: function() {
-        var froala = this.$().editable(this.get('params')),
-            events = this.get('eventNames');
+      const events = this.get('eventNames');
+      const froala = this.$().editable(this.get('params'));
+      const froalaElement = this.$();
 
-        const froalaElement = this.$();
-        froalaElement.editable('setHTML', this.get('value') || '', false);
+      froalaElement.editable('setHTML', this.get('value') || '', false);
 
-        events.forEach((key) => {
-          if(this.attrs[key]) {
-            froalaElement.on('editable.'+key, proxy(this.handleFroalaEvent, this));
-          }
-        });
+      events.forEach((key) => {
+        if (this.attrs[key]) {
+          froalaElement.on('editable.' + key, proxy(this.handleFroalaEvent, this));
+        }
+      });
 
-        this.set('_froala', froala);
+      this.set('_froala', froala);
     },
 
     handleFroalaEvent: function(event, editor) {
       const eventName = event.namespace;
       const actionHandler = this.attrs[eventName];
-      if(isFunction(actionHandler)) {
+
+      if (isFunction(actionHandler)) {
         actionHandler(event, editor);
       } else {
         this.sendAction(eventName, event, editor);
@@ -123,9 +125,9 @@ export default Ember.Component.extend({
     },
 
     willDestroyElement: function() {
-        if (this.get('_froala')) {
-            this.$().editable('destroy');
-        }
+      if (this.get('_froala')) {
+        this.$().editable('destroy');
+      }
     }
 });
 
